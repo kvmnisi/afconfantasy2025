@@ -1,106 +1,24 @@
-// Check authentication when app loads
-// Check authentication when app loads
-async function checkAuth() {
-    console.log('Checking auth on game page...')
-    
-    const { data: { session } } = await supabase.auth.getSession()
-    
-    if (!session) {
-        console.log('No session found, redirecting to login')
-        // Redirect to login page (index.html at /)
-        window.location.href = '/'
-        return
-    }
-    
-    console.log('User logged in:', session.user.email)
-    
-    // Set user email in navbar
-    const userEmailElement = document.getElementById('user-email')
-    if (userEmailElement) {
-        userEmailElement.textContent = session.user.email
-    }
-    
-    // Load user's team from database
-    await loadTeamFromDatabase()
-}
+// script.js - Fantasy Game Logic
 
-// Initialize when app page loads
-// Check if we're on the app page (served at /app)
-if (window.location.pathname === '/app' || window.location.pathname.endsWith('/app')) {
-    document.addEventListener('DOMContentLoaded', async () => {
-        await checkAuth()
-        displayPlayers()
-    })
-}
+console.log('=== Fantasy Game Script Loading ===')
 
-// Update loadTeamFromDatabase to show loading
-async function loadTeamFromDatabase() {
-    showAppLoading(true)
-    
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
-        showAppLoading(false)
-        return
-    }
-
-    const { data, error } = await supabase
-        .from('teams')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
-
-    showAppLoading(false)
-    
-    if (error && error.code !== 'PGRST116') {
-        console.error('Error loading team:', error)
-        alert('Failed to load your saved team')
-    } else if (data) {
-        // Load saved team
-        selectedPlayers = data.players || []
-        teamStructure = data.formation || {
-            xi: { GK: null, DEF: [null, null, null, null], MID: [null, null, null, null], FWD: [null, null] },
-            bench: [null, null, null, null]
-        }
-        displayPlayers()
-    }
-}
-
-function showAppLoading(show = true) {
-    document.getElementById('loading').style.display = show ? 'flex' : 'none'
-}
-
-// Initialize when app page loads
-if (window.location.pathname.includes('app.html')) {
-    document.addEventListener('DOMContentLoaded', async () => {
-        await checkAuth()
-        // Your existing initialization code
-        displayPlayers()
-    })
-}// Enhanced player data
+// Player data and game variables
 const fakePlayers = [
-    // Goalkeepers (10)
     { id: 1, name: "Ali Ben Cherif", club: "Morocco", position: "GK", value: 8.5 },
     { id: 2, name: "Vincent Enyeama", club: "Nigeria", position: "GK", value: 9.0 },
     { id: 3, name: "André Onana", club: "Cameroon", position: "GK", value: 8.0 },
     { id: 4, name: "Mohammed El Shenawy", club: "Egypt", position: "GK", value: 7.5 },
     { id: 5, name: "Edouard Mendy", club: "Senegal", position: "GK", value: 9.5 },
-    
-    // Defenders (20)
     { id: 6, name: "Kalidou Koulibaly", club: "Senegal", position: "DEF", value: 10.0 },
     { id: 7, name: "Achraf Hakimi", club: "Morocco", position: "DEF", value: 9.5 },
     { id: 8, name: "Joel Matip", club: "Cameroon", position: "DEF", value: 9.0 },
     { id: 9, name: "Ramy Bensebaini", club: "Algeria", position: "DEF", value: 8.0 },
     { id: 10, name: "Nahuel Molina", club: "Argentina", position: "DEF", value: 8.5 },
-    
-    // Midfielders (30)
     { id: 11, name: "Mohamed Salah", club: "Egypt", position: "MID", value: 12.5 },
     { id: 12, name: "Riyad Mahrez", club: "Algeria", position: "MID", value: 11.5 },
     { id: 13, name: "Sadio Mané", club: "Senegal", position: "MID", value: 12.0 },
     { id: 14, name: "Thomas Partey", club: "Ghana", position: "MID", value: 9.5 },
     { id: 15, name: "Franck Kessié", club: "Ivory Coast", position: "MID", value: 9.0 },
-    
-    // Forwards (20)
     { id: 16, name: "Victor Osimhen", club: "Nigeria", position: "FWD", value: 11.0 },
     { id: 17, name: "Sébastien Haller", club: "Ivory Coast", position: "FWD", value: 10.5 },
     { id: 18, name: "Pierre-Emerick Aubameyang", club: "Gabon", position: "FWD", value: 10.0 },
@@ -145,6 +63,109 @@ let teamStructure = {
     bench: [null, null, null, null]
 };
 
+// ===================== AUTH FUNCTIONS =====================
+
+// Check authentication when app loads
+async function checkAuth() {
+    console.log('checkAuth() called')
+    
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        
+        if (error) {
+            console.error('Auth session error:', error)
+            return false
+        }
+        
+        if (!session) {
+            console.log('No session found, redirecting to login')
+            window.location.href = '/'
+            return false
+        }
+        
+        console.log('User logged in:', session.user.email)
+        
+        // Set user email in navbar
+        const userEmailElement = document.getElementById('user-email')
+        if (userEmailElement) {
+            userEmailElement.textContent = session.user.email
+        }
+        
+        return true
+    } catch (err) {
+        console.error('Error in checkAuth:', err)
+        return false
+    }
+}
+
+async function loadTeamFromDatabase() {
+    console.log('Loading team from database...')
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+        console.log('No user found')
+        return
+    }
+
+    const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+    if (error && error.code !== 'PGRST116') {
+        console.error('Error loading team:', error)
+    } else if (data) {
+        console.log('Loaded saved team:', data)
+        selectedPlayers = data.players || []
+        teamStructure = data.formation || {
+            xi: { GK: null, DEF: [null, null, null, null], MID: [null, null, null, null], FWD: [null, null] },
+            bench: [null, null, null, null]
+        }
+    }
+}
+
+async function saveTeamToDatabase() {
+    console.log('Saving team to database...')
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+        alert('Please login to save your team')
+        return
+    }
+
+    const teamData = {
+        user_id: user.id,
+        players: selectedPlayers,
+        formation: teamStructure,
+        total_value: selectedPlayers.reduce((sum, p) => sum + p.value, 0)
+    }
+
+    const { data, error } = await supabase
+        .from('teams')
+        .upsert({ ...teamData, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+        .select()
+
+    if (error) {
+        console.error('Error saving team:', error)
+        alert('Failed to save team. Please try again.')
+    } else {
+        console.log('Team saved:', data)
+        alert('Team saved successfully!')
+    }
+}
+
+function showAppLoading(show = true) {
+    const loadingEl = document.getElementById('loading')
+    if (loadingEl) {
+        loadingEl.style.display = show ? 'flex' : 'none'
+    }
+}
+
+// ===================== GAME FUNCTIONS =====================
+
 function switchMode(mode) {
     document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.game-mode').forEach(section => section.style.display = 'none');
@@ -159,7 +180,13 @@ function switchMode(mode) {
 }
 
 function displayPlayers() {
+    console.log('displayPlayers() called')
     const grid = document.getElementById('players-grid');
+    if (!grid) {
+        console.error('players-grid element not found!')
+        return
+    }
+    
     grid.innerHTML = '';
     
     fakePlayers.forEach(player => {
@@ -221,7 +248,6 @@ function togglePlayer(playerId) {
     if (index === -1) {
         selectedPlayers.push(player);
     } else {
-        // Remove player from team structure first
         removePlayerFromStructure(playerId);
         selectedPlayers.splice(index, 1);
     }
@@ -233,7 +259,6 @@ function selectPosition(position, slotType) {
     currentPosition = position;
     currentSlotType = slotType;
     
-    // Filter players based on position
     let availablePlayers;
     if (position === 'any') {
         availablePlayers = selectedPlayers.filter(player => 
@@ -282,7 +307,6 @@ function closeModal() {
 
 function assignPlayerToSlot(player) {
     if (currentSlotType === 'bench') {
-        // Find empty bench slot
         const benchIndex = teamStructure.bench.findIndex(slot => slot === null);
         if (benchIndex !== -1) {
             teamStructure.bench[benchIndex] = player.id;
@@ -290,7 +314,6 @@ function assignPlayerToSlot(player) {
             document.getElementById(`bench-${benchIndex + 1}`).parentElement.classList.add('filled');
         }
     } else if (currentSlotType === 'xi') {
-        // Assign to starting XI
         if (currentPosition === 'GK') {
             teamStructure.xi.GK = player.id;
             document.getElementById('xi-gk').textContent = player.name;
@@ -311,28 +334,24 @@ function assignPlayerToSlot(player) {
 }
 
 function isPlayerInStructure(playerId) {
-    // Check if player is already in starting XI
     if (teamStructure.xi.GK === playerId) return true;
     
     for (const position of ['DEF', 'MID', 'FWD']) {
         if (teamStructure.xi[position].includes(playerId)) return true;
     }
     
-    // Check bench
     if (teamStructure.bench.includes(playerId)) return true;
     
     return false;
 }
 
 function removePlayerFromStructure(playerId) {
-    // Remove from GK
     if (teamStructure.xi.GK === playerId) {
         teamStructure.xi.GK = null;
         document.getElementById('xi-gk').textContent = 'Empty';
         document.getElementById('xi-gk').parentElement.classList.remove('filled');
     }
     
-    // Remove from DEF
     teamStructure.xi.DEF = teamStructure.xi.DEF.map(id => {
         if (id === playerId) {
             const index = teamStructure.xi.DEF.indexOf(playerId);
@@ -343,7 +362,6 @@ function removePlayerFromStructure(playerId) {
         return id;
     });
     
-    // Remove from MID
     teamStructure.xi.MID = teamStructure.xi.MID.map(id => {
         if (id === playerId) {
             const index = teamStructure.xi.MID.indexOf(playerId);
@@ -354,7 +372,6 @@ function removePlayerFromStructure(playerId) {
         return id;
     });
     
-    // Remove from FWD
     teamStructure.xi.FWD = teamStructure.xi.FWD.map(id => {
         if (id === playerId) {
             const index = teamStructure.xi.FWD.indexOf(playerId);
@@ -365,7 +382,6 @@ function removePlayerFromStructure(playerId) {
         return id;
     });
     
-    // Remove from bench
     teamStructure.bench = teamStructure.bench.map((id, index) => {
         if (id === playerId) {
             document.getElementById(`bench-${index + 1}`).textContent = 'Empty';
@@ -377,15 +393,19 @@ function removePlayerFromStructure(playerId) {
 }
 
 function updateTeamDisplay() {
-    // Update the team summary display
     const totalValue = selectedPlayers.reduce((sum, p) => sum + p.value, 0);
     const xiCount = countPlayersInXI();
     const benchCount = countPlayersInBench();
     
-    document.getElementById('summary-xi').textContent = xiCount;
-    document.getElementById('summary-bench').textContent = benchCount;
-    document.getElementById('summary-value').textContent = totalValue.toFixed(1);
-    document.getElementById('summary-remaining').textContent = (budget - totalValue).toFixed(1);
+    const summaryXi = document.getElementById('summary-xi')
+    const summaryBench = document.getElementById('summary-bench')
+    const summaryValue = document.getElementById('summary-value')
+    const summaryRemaining = document.getElementById('summary-remaining')
+    
+    if (summaryXi) summaryXi.textContent = xiCount;
+    if (summaryBench) summaryBench.textContent = benchCount;
+    if (summaryValue) summaryValue.textContent = totalValue.toFixed(1);
+    if (summaryRemaining) summaryRemaining.textContent = (budget - totalValue).toFixed(1);
 }
 
 function countPlayersInXI() {
@@ -408,16 +428,25 @@ function updateCounts() {
     const xiCount = countPlayersInXI();
     const benchCount = countPlayersInBench();
     
-    document.getElementById('budget').textContent = (budget - totalValue).toFixed(1);
-    document.getElementById('team-count').textContent = selectedPlayers.length;
-    document.getElementById('xi-count').textContent = xiCount;
-    document.getElementById('bench-count').textContent = benchCount;
+    const budgetEl = document.getElementById('budget')
+    const teamCountEl = document.getElementById('team-count')
+    const xiCountEl = document.getElementById('xi-count')
+    const benchCountEl = document.getElementById('bench-count')
     
-    // Update position counts
-    document.getElementById('gk-count').textContent = selectedPlayers.filter(p => p.position === 'GK').length;
-    document.getElementById('def-count').textContent = selectedPlayers.filter(p => p.position === 'DEF').length;
-    document.getElementById('mid-count').textContent = selectedPlayers.filter(p => p.position === 'MID').length;
-    document.getElementById('fwd-count').textContent = selectedPlayers.filter(p => p.position === 'FWD').length;
+    if (budgetEl) budgetEl.textContent = (budget - totalValue).toFixed(1);
+    if (teamCountEl) teamCountEl.textContent = selectedPlayers.length;
+    if (xiCountEl) xiCountEl.textContent = xiCount;
+    if (benchCountEl) benchCountEl.textContent = benchCount;
+    
+    const gkCountEl = document.getElementById('gk-count')
+    const defCountEl = document.getElementById('def-count')
+    const midCountEl = document.getElementById('mid-count')
+    const fwdCountEl = document.getElementById('fwd-count')
+    
+    if (gkCountEl) gkCountEl.textContent = selectedPlayers.filter(p => p.position === 'GK').length;
+    if (defCountEl) defCountEl.textContent = selectedPlayers.filter(p => p.position === 'DEF').length;
+    if (midCountEl) midCountEl.textContent = selectedPlayers.filter(p => p.position === 'MID').length;
+    if (fwdCountEl) fwdCountEl.textContent = selectedPlayers.filter(p => p.position === 'FWD').length;
 }
 
 function filterPlayers() {
@@ -471,7 +500,6 @@ function clearTeam() {
             bench: [null, null, null, null]
         };
         
-        // Reset all slot displays
         document.querySelectorAll('.player-assigned').forEach(el => {
             el.textContent = 'Empty';
             el.parentElement.classList.remove('filled');
@@ -488,7 +516,6 @@ function autoPick() {
     
     clearTeam();
     
-    // Auto pick logic
     const positions = [
         { pos: 'GK', count: 2 },
         { pos: 'DEF', count: 5 },
@@ -498,34 +525,32 @@ function autoPick() {
     
     let remainingBudget = budget;
     selectedPlayers = [];
+    const availablePlayers = [...fakePlayers]; // Copy array
     
     for (const pos of positions) {
-        const availablePlayers = fakePlayers
+        const filteredPlayers = availablePlayers
             .filter(p => p.position === pos.pos)
-            .sort((a, b) => b.value - a.value); // Sort by value descending
+            .sort((a, b) => b.value - a.value);
         
-        for (let i = 0; i < pos.count && availablePlayers.length > 0; i++) {
-            // Find affordable player
-            const player = availablePlayers.find(p => p.value <= remainingBudget);
+        for (let i = 0; i < pos.count && filteredPlayers.length > 0; i++) {
+            const player = filteredPlayers.find(p => p.value <= remainingBudget);
             if (player) {
                 selectedPlayers.push(player);
                 remainingBudget -= player.value;
-                // Remove from available to avoid duplicates
-                const index = fakePlayers.indexOf(player);
-                fakePlayers.splice(index, 1);
+                const index = availablePlayers.indexOf(player);
+                availablePlayers.splice(index, 1);
             }
         }
     }
     
-    // Fill remaining spots with cheapest available
-    while (selectedPlayers.length < 15 && fakePlayers.length > 0) {
-        const cheapPlayers = [...fakePlayers].sort((a, b) => a.value - b.value);
+    while (selectedPlayers.length < 15 && availablePlayers.length > 0) {
+        const cheapPlayers = [...availablePlayers].sort((a, b) => a.value - b.value);
         for (const player of cheapPlayers) {
             if (player.value <= remainingBudget) {
                 selectedPlayers.push(player);
                 remainingBudget -= player.value;
-                const index = fakePlayers.indexOf(player);
-                fakePlayers.splice(index, 1);
+                const index = availablePlayers.indexOf(player);
+                availablePlayers.splice(index, 1);
                 break;
             }
         }
@@ -553,7 +578,6 @@ function submitTeam() {
         return;
     }
     
-    // Check team composition
     const gkCount = selectedPlayers.filter(p => p.position === 'GK').length;
     const defCount = selectedPlayers.filter(p => p.position === 'DEF').length;
     const midCount = selectedPlayers.filter(p => p.position === 'MID').length;
@@ -570,16 +594,8 @@ function submitTeam() {
         return;
     }
     
-    // Save team to localStorage (in real app, send to server)
-    const teamData = {
-        players: selectedPlayers,
-        formation: teamStructure,
-        submittedAt: new Date().toISOString()
-    };
-    
-    localStorage.setItem('fantasyTeam', JSON.stringify(teamData));
-    alert('Team submitted successfully!');
-    console.log('Team saved:', teamData);
+    // Save to Supabase database
+    saveTeamToDatabase()
 }
 
 // Close modal when clicking outside
@@ -590,21 +606,51 @@ window.onclick = function(event) {
     }
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    displayPlayers();
+// ===================== INITIALIZATION =====================
+
+async function initializeGame() {
+    console.log('Initializing game...')
     
-    // Load saved team if exists
-    const savedTeam = localStorage.getItem('fantasyTeam');
-    if (savedTeam) {
-        try {
-            const teamData = JSON.parse(savedTeam);
-            selectedPlayers = teamData.players;
-            teamStructure = teamData.formation;
-            displayPlayers();
-            alert('Loaded previously saved team!');
-        } catch (e) {
-            console.log('No valid saved team found');
-        }
+    // Check if we're on the game page
+    const isGamePage = window.location.pathname === '/app' || 
+                      window.location.pathname.endsWith('/app') ||
+                      window.location.pathname.includes('app.html')
+    
+    console.log('Is game page?', isGamePage)
+    
+    if (!isGamePage) {
+        console.log('Not on game page, skipping game init')
+        return
     }
-});
+    
+    // Check authentication
+    const isAuthenticated = await checkAuth()
+    
+    if (!isAuthenticated) {
+        console.log('User not authenticated, stopping initialization')
+        return
+    }
+    
+    console.log('User authenticated, loading team...')
+    
+    // Load team from database
+    await loadTeamFromDatabase()
+    
+    // Initialize game display
+    displayPlayers()
+    
+    console.log('Game initialized successfully')
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initializeGame)
+
+// Make functions globally available
+window.switchMode = switchMode
+window.togglePlayer = togglePlayer
+window.selectPosition = selectPosition
+window.closeModal = closeModal
+window.filterPlayers = filterPlayers
+window.clearTeam = clearTeam
+window.autoPick = autoPick
+window.submitTeam = submitTeam

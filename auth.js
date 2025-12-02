@@ -1,19 +1,19 @@
 // auth.js - Authentication Logic
 import { supabase } from './supabase.js'
 
-let currentUser = null
-
 // Initialize auth state
 async function initAuth() {
+    console.log('Auth init - checking session...')
+    
     const { data: { session } } = await supabase.auth.getSession()
     
     if (session) {
-        // User is already logged in, redirect to app
+        console.log('Already logged in, redirecting to /app')
         window.location.href = '/app'
         return
     }
     
-    // Show login form
+    console.log('Not logged in, showing login form')
     showLoading(false)
 }
 
@@ -30,7 +30,10 @@ function switchToLogin() {
 
 // Show/hide loading
 function showLoading(show = true) {
-    document.getElementById('loading').style.display = show ? 'flex' : 'none'
+    const loadingEl = document.getElementById('loading')
+    if (loadingEl) {
+        loadingEl.style.display = show ? 'flex' : 'none'
+    }
 }
 
 // Sign in function
@@ -58,7 +61,8 @@ async function signIn() {
         return
     }
     
-    // Success - redirect to app
+    console.log('Sign in successful, redirecting to /app')
+    // Success - redirect to app using pretty URL
     window.location.href = '/app'
 }
 
@@ -126,21 +130,20 @@ async function signOut() {
     }
     
     // Redirect to home page
-    window.location.href = 'index.html'
+    window.location.href = '/'
 }
 
-// Listen for auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
-    console.log('Auth state changed:', event, session)
+// REMOVE OR COMMENT OUT THIS EVENT LISTENER - IT'S CAUSING THE LOOP
+// supabase.auth.onAuthStateChange((event, session) => {
+//     console.log('Auth state changed:', event, session)
     
-    if (event === 'SIGNED_IN') {
-        // User signed in, redirect to app
-        window.location.href = 'app.html'
-    } else if (event === 'SIGNED_OUT') {
-        // User signed out, stay on index.html
-        // (already there or will be redirected)
-    }
-})
+//     if (event === 'SIGNED_IN') {
+//         // User signed in, redirect to app
+//         window.location.href = 'app.html'
+//     } else if (event === 'SIGNED_OUT') {
+//         // User signed out, stay on index.html
+//     }
+// })
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', initAuth)
