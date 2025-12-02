@@ -11,7 +11,7 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-trophy"></i> Fantasy AFCON League</h1>
-            <p>Create your dream team and compete with friends!</p>
+            <p>Create your African dream team and compete with friends!</p>
         </header>
 
         <div class="mode-selector">
@@ -51,12 +51,122 @@
                 </div>
             </div>
 
+            <!-- Replace the existing my-team section with this: -->
+
             <div class="my-team">
                 <h3>My Team (<span id="team-count">0</span>/15)</h3>
-                <div class="team-players" id="my-team">
-                    <!-- Selected players will appear here -->
+                
+                <div class="team-formation">
+                    <div class="starting-xi">
+                        <h4>Starting XI <span id="xi-count">0</span>/11</h4>
+                        <div class="formation-layout">
+                            <!-- Goalkeeper -->
+                            <div class="position-slot gk-slot" data-position="GK" data-slot="xi" onclick="selectPosition('GK', 'xi')">
+                                <div class="slot-label">GK</div>
+                                <div class="player-assigned" id="xi-gk">Empty</div>
+                            </div>
+                            
+                            <!-- Defenders (4) -->
+                            <div class="defenders-row">
+                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
+                                    <div class="slot-label">DEF</div>
+                                    <div class="player-assigned" id="xi-def-1">Empty</div>
+                                </div>
+                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
+                                    <div class="slot-label">DEF</div>
+                                    <div class="player-assigned" id="xi-def-2">Empty</div>
+                                </div>
+                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
+                                    <div class="slot-label">DEF</div>
+                                    <div class="player-assigned" id="xi-def-3">Empty</div>
+                                </div>
+                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
+                                    <div class="slot-label">DEF</div>
+                                    <div class="player-assigned" id="xi-def-4">Empty</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Midfielders (4) -->
+                            <div class="midfielders-row">
+                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
+                                    <div class="slot-label">MID</div>
+                                    <div class="player-assigned" id="xi-mid-1">Empty</div>
+                                </div>
+                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
+                                    <div class="slot-label">MID</div>
+                                    <div class="player-assigned" id="xi-mid-2">Empty</div>
+                                </div>
+                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
+                                    <div class="slot-label">MID</div>
+                                    <div class="player-assigned" id="xi-mid-3">Empty</div>
+                                </div>
+                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
+                                    <div class="slot-label">MID</div>
+                                    <div class="player-assigned" id="xi-mid-4">Empty</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Forwards (2) -->
+                            <div class="forwards-row">
+                                <div class="position-slot fwd-slot" data-position="FWD" data-slot="xi" onclick="selectPosition('FWD', 'xi')">
+                                    <div class="slot-label">FWD</div>
+                                    <div class="player-assigned" id="xi-fwd-1">Empty</div>
+                                </div>
+                                <div class="position-slot fwd-slot" data-position="FWD" data-slot="xi" onclick="selectPosition('FWD', 'xi')">
+                                    <div class="slot-label">FWD</div>
+                                    <div class="player-assigned" id="xi-fwd-2">Empty</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bench-section">
+                        <h4>Bench <span id="bench-count">0</span>/4</h4>
+                        <div class="bench-layout">
+                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
+                                <div class="slot-label">BENCH</div>
+                                <div class="player-assigned" id="bench-1">Empty</div>
+                            </div>
+                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
+                                <div class="slot-label">BENCH</div>
+                                <div class="player-assigned" id="bench-2">Empty</div>
+                            </div>
+                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
+                                <div class="slot-label">BENCH</div>
+                                <div class="player-assigned" id="bench-3">Empty</div>
+                            </div>
+                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
+                                <div class="slot-label">BENCH</div>
+                                <div class="player-assigned" id="bench-4">Empty</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button class="btn-submit" onclick="submitTeam()">Submit Team</button>
+                
+                <div class="team-summary-card">
+                    <h4>Team Summary</h4>
+                    <div class="summary-grid">
+                        <div>Starting XI: <span id="summary-xi">0</span>/11</div>
+                        <div>Bench: <span id="summary-bench">0</span>/4</div>
+                        <div>Total Value: <span id="summary-value">0</span>m</div>
+                        <div>Remaining: <span id="summary-remaining">100</span>m</div>
+                    </div>
+                </div>
+                
+                <div class="team-actions">
+                    <button class="btn-clear" onclick="clearTeam()">Clear Team</button>
+                    <button class="btn-auto" onclick="autoPick()">Auto Pick</button>
+                    <button class="btn-submit" onclick="submitTeam()">Submit Team</button>
+                </div>
+            </div>
+
+            <!-- Add this modal for position selection -->
+            <div id="position-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h3 id="modal-title">Select Player</h3>
+                    <div id="modal-players"></div>
+                </div>
             </div>
         </div>
 
