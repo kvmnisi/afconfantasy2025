@@ -1,18 +1,36 @@
 // Check authentication when app loads
+// Check authentication when app loads
 async function checkAuth() {
+    console.log('Checking auth on game page...')
+    
     const { data: { session } } = await supabase.auth.getSession()
     
     if (!session) {
-        // Not logged in, redirect to home
-        window.location.href = 'index.html'
+        console.log('No session found, redirecting to login')
+        // Redirect to login page (index.html at /)
+        window.location.href = '/'
         return
     }
     
+    console.log('User logged in:', session.user.email)
+    
     // Set user email in navbar
-    document.getElementById('user-email').textContent = session.user.email
+    const userEmailElement = document.getElementById('user-email')
+    if (userEmailElement) {
+        userEmailElement.textContent = session.user.email
+    }
     
     // Load user's team from database
     await loadTeamFromDatabase()
+}
+
+// Initialize when app page loads
+// Check if we're on the app page (served at /app)
+if (window.location.pathname === '/app' || window.location.pathname.endsWith('/app')) {
+    document.addEventListener('DOMContentLoaded', async () => {
+        await checkAuth()
+        displayPlayers()
+    })
 }
 
 // Update loadTeamFromDatabase to show loading
