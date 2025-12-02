@@ -57,6 +57,25 @@
     position: relative;
 }
 
+/* Show dropdown on hover */
+.user-dropdown:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto; /* Allow clicking when visible */
+}
+
+/* Create a gap between button and dropdown to prevent flicker */
+.user-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 15px; /* Gap area */
+    background: transparent;
+}
+
 .user-menu-btn {
     background: var(--caf-green);
     color: var(--caf-white);
