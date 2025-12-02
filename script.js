@@ -1,4 +1,65 @@
-// Enhanced player data
+// Check authentication when app loads
+async function checkAuth() {
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (!session) {
+        // Not logged in, redirect to home
+        window.location.href = 'index.html'
+        return
+    }
+    
+    // Set user email in navbar
+    document.getElementById('user-email').textContent = session.user.email
+    
+    // Load user's team from database
+    await loadTeamFromDatabase()
+}
+
+// Update loadTeamFromDatabase to show loading
+async function loadTeamFromDatabase() {
+    showAppLoading(true)
+    
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) {
+        showAppLoading(false)
+        return
+    }
+
+    const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+    showAppLoading(false)
+    
+    if (error && error.code !== 'PGRST116') {
+        console.error('Error loading team:', error)
+        alert('Failed to load your saved team')
+    } else if (data) {
+        // Load saved team
+        selectedPlayers = data.players || []
+        teamStructure = data.formation || {
+            xi: { GK: null, DEF: [null, null, null, null], MID: [null, null, null, null], FWD: [null, null] },
+            bench: [null, null, null, null]
+        }
+        displayPlayers()
+    }
+}
+
+function showAppLoading(show = true) {
+    document.getElementById('loading').style.display = show ? 'flex' : 'none'
+}
+
+// Initialize when app page loads
+if (window.location.pathname.includes('app.html')) {
+    document.addEventListener('DOMContentLoaded', async () => {
+        await checkAuth()
+        // Your existing initialization code
+        displayPlayers()
+    })
+}// Enhanced player data
 const fakePlayers = [
     // Goalkeepers (10)
     { id: 1, name: "Ali Ben Cherif", club: "Morocco", position: "GK", value: 8.5 },

@@ -3,183 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy AFCON League</title>
+    <title>Fantasy AFCON - Login</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="auth.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-trophy"></i> Fantasy AFCON League</h1>
-            <p>Create your African dream team and compete with friends!</p>
-        </header>
-
-        <div class="mode-selector">
-            <button class="mode-btn active" onclick="switchMode('budget')">
-                <i class="fas fa-coins"></i> Budget Mode (100m)
-            </button>
-            <button class="mode-btn" onclick="switchMode('draft')">
-                <i class="fas fa-users"></i> Draft Mode
-            </button>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="logo">
+                <i class="fas fa-futbol"></i>
+                <h1>Fantasy AFCON</h1>
+            </div>
+            <p class="tagline">Create your dream team. Compete with friends.</p>
         </div>
 
-        <div id="budget-mode" class="game-mode">
-            <div class="budget-header">
-                <h2>Budget: <span id="budget">100</span>m</h2>
-                <div class="team-summary">
-                    <div>GK: <span id="gk-count">0</span>/2</div>
-                    <div>DEF: <span id="def-count">0</span>/5</div>
-                    <div>MID: <span id="mid-count">0</span>/5</div>
-                    <div>FWD: <span id="fwd-count">0</span>/3</div>
-                </div>
-            </div>
-
-            <div class="players-container">
-                <div class="filters">
-                    <input type="text" id="search" placeholder="Search players..." onkeyup="filterPlayers()">
-                    <select id="position-filter" onchange="filterPlayers()">
-                        <option value="all">All Positions</option>
-                        <option value="GK">Goalkeeper</option>
-                        <option value="DEF">Defender</option>
-                        <option value="MID">Midfielder</option>
-                        <option value="FWD">Forward</option>
-                    </select>
-                </div>
-
-                <div class="players-grid" id="players-grid">
-                    <!-- Players will be loaded here -->
-                </div>
-            </div>
-
-            <!-- Replace the existing my-team section with this: -->
-
-            <div class="my-team">
-                <h3>My Team (<span id="team-count">0</span>/15)</h3>
-                
-                <div class="team-formation">
-                    <div class="starting-xi">
-                        <h4>Starting XI <span id="xi-count">0</span>/11</h4>
-                        <div class="formation-layout">
-                            <!-- Goalkeeper -->
-                            <div class="position-slot gk-slot" data-position="GK" data-slot="xi" onclick="selectPosition('GK', 'xi')">
-                                <div class="slot-label">GK</div>
-                                <div class="player-assigned" id="xi-gk">Empty</div>
-                            </div>
-                            
-                            <!-- Defenders (4) -->
-                            <div class="defenders-row">
-                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
-                                    <div class="slot-label">DEF</div>
-                                    <div class="player-assigned" id="xi-def-1">Empty</div>
-                                </div>
-                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
-                                    <div class="slot-label">DEF</div>
-                                    <div class="player-assigned" id="xi-def-2">Empty</div>
-                                </div>
-                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
-                                    <div class="slot-label">DEF</div>
-                                    <div class="player-assigned" id="xi-def-3">Empty</div>
-                                </div>
-                                <div class="position-slot def-slot" data-position="DEF" data-slot="xi" onclick="selectPosition('DEF', 'xi')">
-                                    <div class="slot-label">DEF</div>
-                                    <div class="player-assigned" id="xi-def-4">Empty</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Midfielders (4) -->
-                            <div class="midfielders-row">
-                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
-                                    <div class="slot-label">MID</div>
-                                    <div class="player-assigned" id="xi-mid-1">Empty</div>
-                                </div>
-                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
-                                    <div class="slot-label">MID</div>
-                                    <div class="player-assigned" id="xi-mid-2">Empty</div>
-                                </div>
-                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
-                                    <div class="slot-label">MID</div>
-                                    <div class="player-assigned" id="xi-mid-3">Empty</div>
-                                </div>
-                                <div class="position-slot mid-slot" data-position="MID" data-slot="xi" onclick="selectPosition('MID', 'xi')">
-                                    <div class="slot-label">MID</div>
-                                    <div class="player-assigned" id="xi-mid-4">Empty</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Forwards (2) -->
-                            <div class="forwards-row">
-                                <div class="position-slot fwd-slot" data-position="FWD" data-slot="xi" onclick="selectPosition('FWD', 'xi')">
-                                    <div class="slot-label">FWD</div>
-                                    <div class="player-assigned" id="xi-fwd-1">Empty</div>
-                                </div>
-                                <div class="position-slot fwd-slot" data-position="FWD" data-slot="xi" onclick="selectPosition('FWD', 'xi')">
-                                    <div class="slot-label">FWD</div>
-                                    <div class="player-assigned" id="xi-fwd-2">Empty</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bench-section">
-                        <h4>Bench <span id="bench-count">0</span>/4</h4>
-                        <div class="bench-layout">
-                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
-                                <div class="slot-label">BENCH</div>
-                                <div class="player-assigned" id="bench-1">Empty</div>
-                            </div>
-                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
-                                <div class="slot-label">BENCH</div>
-                                <div class="player-assigned" id="bench-2">Empty</div>
-                            </div>
-                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
-                                <div class="slot-label">BENCH</div>
-                                <div class="player-assigned" id="bench-3">Empty</div>
-                            </div>
-                            <div class="bench-slot" data-position="any" data-slot="bench" onclick="selectPosition('any', 'bench')">
-                                <div class="slot-label">BENCH</div>
-                                <div class="player-assigned" id="bench-4">Empty</div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="auth-box" id="login-box">
+            <h2>Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to manage your fantasy team</p>
+            
+            <div class="auth-form">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Email address" class="auth-input">
                 </div>
                 
-                <div class="team-summary-card">
-                    <h4>Team Summary</h4>
-                    <div class="summary-grid">
-                        <div>Starting XI: <span id="summary-xi">0</span>/11</div>
-                        <div>Bench: <span id="summary-bench">0</span>/4</div>
-                        <div>Total Value: <span id="summary-value">0</span>m</div>
-                        <div>Remaining: <span id="summary-remaining">100</span>m</div>
-                    </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" class="auth-input">
                 </div>
                 
-                <div class="team-actions">
-                    <button class="btn-clear" onclick="clearTeam()">Clear Team</button>
-                    <button class="btn-auto" onclick="autoPick()">Auto Pick</button>
-                    <button class="btn-submit" onclick="submitTeam()">Submit Team</button>
+                <button onclick="signIn()" class="auth-btn primary-btn">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                
+                <div class="auth-divider">
+                    <span>or</span>
                 </div>
-            </div>
-
-            <!-- Add this modal for position selection -->
-            <div id="position-modal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <h3 id="modal-title">Select Player</h3>
-                    <div id="modal-players"></div>
-                </div>
+                
+                <button onclick="switchToSignup()" class="auth-btn secondary-btn">
+                    Create New Account
+                </button>
+                
+                <p class="auth-note">
+                    By continuing, you agree to our 
+                    <a href="#" class="auth-link">Terms</a> and 
+                    <a href="#" class="auth-link">Privacy Policy</a>
+                </p>
             </div>
         </div>
 
-        <div id="draft-mode" class="game-mode" style="display: none;">
-            <h2>Draft Mode - Coming Soon!</h2>
-            <p>Turn-based player selection with friends</p>
-            <div class="draft-info">
-                <p>Each team: 15 players (2 GK, 5 DEF, 5 MID, 3 FWD)</p>
-                <p>Snake draft order</p>
+        <div class="auth-box" id="signup-box" style="display: none;">
+            <h2>Join Fantasy AFCON</h2>
+            <p class="auth-subtitle">Create your account to start playing</p>
+            
+            <div class="auth-form">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="signup-name" placeholder="Full Name" class="auth-input">
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="signup-email" placeholder="Email address" class="auth-input">
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="signup-password" placeholder="Create password" class="auth-input">
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="signup-confirm" placeholder="Confirm password" class="auth-input">
+                </div>
+                
+                <button onclick="signUp()" class="auth-btn primary-btn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+                
+                <button onclick="switchToLogin()" class="auth-btn text-btn">
+                    Already have an account? Sign In
+                </button>
             </div>
+        </div>
+
+        <div class="auth-features">
+            <div class="feature">
+                <i class="fas fa-users"></i>
+                <h3>Compete with Friends</h3>
+                <p>Create private leagues and draft teams together</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-trophy"></i>
+                <h3>Live Scoring</h3>
+                <p>Real-time points based on actual match performances</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-line"></i>
+                <h3>Advanced Stats</h3>
+                <p>Detailed player statistics and performance analytics</p>
+            </div>
+        </div>
+
+        <div class="auth-footer">
+            <p>© 2024 Fantasy AFCON. All rights reserved.</p>
+            <p>This is a fan project and is not affiliated with CAF.</p>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="loading" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Please wait...</p>
+    </div>
+
+    <script type="module" src="supabase.js"></script>
+    <script type="module" src="auth.js"></script>
 </body>
 </html>
