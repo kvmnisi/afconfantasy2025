@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy AFCON League</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-trophy"></i> Fantasy AFCON League</h1>
+            <p>Create your dream team and compete with friends!</p>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="switchMode('budget')">
+                <i class="fas fa-coins"></i> Budget Mode (100m)
+            </button>
+            <button class="mode-btn" onclick="switchMode('draft')">
+                <i class="fas fa-users"></i> Draft Mode
+            </button>
+        </div>
+
+        <div id="budget-mode" class="game-mode">
+            <div class="budget-header">
+                <h2>Budget: <span id="budget">100</span>m</h2>
+                <div class="team-summary">
+                    <div>GK: <span id="gk-count">0</span>/2</div>
+                    <div>DEF: <span id="def-count">0</span>/5</div>
+                    <div>MID: <span id="mid-count">0</span>/5</div>
+                    <div>FWD: <span id="fwd-count">0</span>/3</div>
+                </div>
+            </div>
+
+            <div class="players-container">
+                <div class="filters">
+                    <input type="text" id="search" placeholder="Search players..." onkeyup="filterPlayers()">
+                    <select id="position-filter" onchange="filterPlayers()">
+                        <option value="all">All Positions</option>
+                        <option value="GK">Goalkeeper</option>
+                        <option value="DEF">Defender</option>
+                        <option value="MID">Midfielder</option>
+                        <option value="FWD">Forward</option>
+                    </select>
+                </div>
+
+                <div class="players-grid" id="players-grid">
+                    <!-- Players will be loaded here -->
+                </div>
+            </div>
+
+            <div class="my-team">
+                <h3>My Team (<span id="team-count">0</span>/15)</h3>
+                <div class="team-players" id="my-team">
+                    <!-- Selected players will appear here -->
+                </div>
+                <button class="btn-submit" onclick="submitTeam()">Submit Team</button>
+            </div>
+        </div>
+
+        <div id="draft-mode" class="game-mode" style="display: none;">
+            <h2>Draft Mode - Coming Soon!</h2>
+            <p>Turn-based player selection with friends</p>
+            <div class="draft-info">
+                <p>Each team: 15 players (2 GK, 5 DEF, 5 MID, 3 FWD)</p>
+                <p>Snake draft order</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
